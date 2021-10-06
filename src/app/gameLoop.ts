@@ -26,4 +26,4 @@ const gameLoop$: Observable<GameTime> =
     });
 
 
-export { gameLoop$ };
+export { gameLoop$, GameTime };

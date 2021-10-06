@@ -62,4 +62,4 @@ const planeState$: Observable<PlaneState> =
         );
 
 
-export { states, firingTransition, planeState$ };
+export { states, firingTransition, planeState$, PlaneState };
