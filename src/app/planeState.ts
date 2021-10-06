@@ -1,5 +1,10 @@
 
 // firing on mousedown
+
+import { Observable, merge } from "rxjs";
+import { map, scan, mapTo } from "rxjs/operators";
+import { mousedown$, mouseup$ } from "./controlStreams";
+
 // idle on mouseup and start
 export type IDLE = "idle";
 export type FIRING = "firing";
@@ -8,17 +13,12 @@ export type FIRING = "firing";
 type PlaneState = FIRING | IDLE;
 
 
-const stateTransitions = (states: StateGraph) => (state: PlaneState, event: PlaneStateMouseEvents) => {
-    return states[state]
-        ?.find(transition => transition.when === event)
-        ?.to 
-        ?? state;
-}
-
 type MouseUp = "mouseup";
-type MousteDown = "mousedown";
+type MouseDown = "mousedown";
 
-type PlaneStateMouseEvents = MouseUp | MousteDown;
+
+type PlaneStateMouseEvents = MouseUp | MouseDown;
+
 
 type PlaneStateTransition = {
     from: PlaneState;
@@ -26,7 +26,22 @@ type PlaneStateTransition = {
     when: PlaneStateMouseEvents;
 }
 
-type StateGraph = { idle: PlaneStateTransition[], firing: PlaneStateTransition[] };
+
+type StateGraph = { 
+    idle: PlaneStateTransition[], 
+    firing: PlaneStateTransition[] 
+};
+
+
+function stateTransitions(states: StateGraph): (state: PlaneState, event: PlaneStateMouseEvents) => PlaneState {
+    return (state, event) => {
+        return states[state]
+            ?.find(transition => transition.when === event)
+            ?.to 
+            ?? state;
+    }
+}
+
 
 const states: StateGraph = {
     idle: [{ from: "idle", to: "firing", when: "mousedown" }],
@@ -37,4 +52,14 @@ const states: StateGraph = {
 // (state, event) => state
 const firingTransition = stateTransitions(states);
 
-export { states, firingTransition };
+
+const planeState$: Observable<PlaneState> =
+    merge(
+        mousedown$.pipe(mapTo<PlaneStateMouseEvents>("mousedown")), 
+        mouseup$.pipe(mapTo<PlaneStateMouseEvents>("mouseup")))
+        .pipe(
+            scan(firingTransition, "idle")
+        );
+
+
+export { states, firingTransition, planeState$ };

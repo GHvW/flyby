@@ -1,7 +1,6 @@
-import { Observable, fromEvent, merge, Subscriber } from "rxjs";
-import { map, mapTo } from "rxjs/operators";
+import { Observable, Subscriber } from "rxjs";
 
-type GameTime = {
+interface GameTime {
     currentTime: number;
     deltaTime: number;
 }
