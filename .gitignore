@@ -1,0 +1,12 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+
+.vs
+.vscode
+.ionide
+.metals
+.idea
+.clj-kondo
