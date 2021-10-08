@@ -25,7 +25,7 @@ function newTexture(path: string): Promise<Texture> {
 function initSprite(texture: Texture): Sprite {
     return {
         texture: texture,
-        coordinates: { x: 0, y: 0 }
+        coordinates: { x: 150, y: 150 }
     }
 }
 

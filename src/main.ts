@@ -6,6 +6,8 @@ import { planeState$, PlaneState } from './app/planeState';
 import './style.css'
 import { loadSprites } from './app/load';
 import { Sprite } from './app/sprite';
+import { render } from './app/render';
+import { movement$ } from './app/controlStreams';
 
  // TODO - actually error handle these
 const canvas: HTMLCanvasElement = document.querySelector('#canvas')!; // yikes!
@@ -17,33 +19,21 @@ const canvasCtx: CanvasRenderingContext2D = canvas.getContext('2d')!; // yikes!
 loadSprites(["./assets/Ships/ship_0005.png"])
   .then(sprites => {
 
-    sprites
-      .map((sprite: Sprite) => { 
-        return {
-          ...sprite, 
-          coordinates: { x: sprite.coordinates.x + 150, y: sprite.coordinates.y + 150 }
-        }
-      })
-      .forEach((sprite: Sprite) => {
-        console.log("a sprite! ", sprite);
-        canvasCtx.drawImage(sprite.texture.img, sprite.coordinates.x, sprite.coordinates.y, 75, 75);
-      });
-  
     gameLoop$
       .pipe(
         take(20))
       .subscribe((it: GameTime) => {
-        // console.log(`the thing ${it.currentTime}, ${it.deltaTime}`);
-        sprites.forEach(sprite => {
-          canvasCtx.drawImage(sprite.texture.img, sprite.coordinates.x + 150, sprite.coordinates.y + 150, 75, 75);
-        });
+
+        render(sprites, canvasCtx);
     });
+
+    movement$
   
     planeState$
       .pipe(
         take(20))
       .subscribe((it: PlaneState) => console.log("updown: ", it));
-  })
+  });
 
 
 const app = document.querySelector<HTMLDivElement>('#app')!
