@@ -21,11 +21,12 @@ loadSprites(["./assets/Ships/ship_0005.png"])
       .map((sprite: Sprite) => { 
         return {
           ...sprite, 
-          coordinates: { x: sprite.coordinates.x + 10, y: sprite.coordinates.y + 10 }
+          coordinates: { x: sprite.coordinates.x + 150, y: sprite.coordinates.y + 150 }
         }
       })
       .forEach((sprite: Sprite) => {
-        canvasCtx.drawImage(sprite.texture.img, sprite.coordinates.x + 150, sprite.coordinates.y + 150, 75, 75);
+        console.log("a sprite! ", sprite);
+        canvasCtx.drawImage(sprite.texture.img, sprite.coordinates.x, sprite.coordinates.y, 75, 75);
       });
   
     gameLoop$
