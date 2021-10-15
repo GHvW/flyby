@@ -86,15 +86,26 @@ type KeydownA = "keydown+a";
 type KeydownS = "keydown+s";
 type KeydownD = "keydown+d";
 
-type MovementEvents 
-    = KeyupW
-    | KeyupA
-    | KeyupS
-    | KeyupD
-    | KeydownW
-    | KeydownA
-    | KeydownS
-    | KeydownD
+// type MovementEvent
+//     = KeyupW
+//     | KeyupA
+//     | KeyupS
+//     | KeyupD
+//     | KeydownW
+//     | KeydownA
+//     | KeydownS
+//     | KeydownD
+
+enum MovementEvent {
+    KeyupW,
+    KeyupA,
+    KeyupS,
+    KeyupD,
+    KeydownW,
+    KeydownA,
+    KeydownS,
+    KeydwonD
+}
 
 
 type Up = "w";
@@ -109,7 +120,7 @@ type UpDown = "w+s";
 type None = "none";
 
 
-type MovementKeys
+type MovementKey
     = Up
     | Down
     | Left
@@ -122,62 +133,66 @@ type MovementKeys
     | None
 
 
-const movementStateMachine: StateGraph<MovementKeys, MovementEvents> = new Map([
-    ["w+a", [
-        { from: "w+a", to: "a", when: "keyup+w" }, 
-        { from: "w+a", to: "w", when: "keyup+a" },
-        { from: "a", to: "none", when: "keyup+a" }
+const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
+    [Movement.UpLeft, [
+        { from: Movement.UpLeft, to: Movement.Left, when: MovementEvent.KeyupW }, 
+        { from: Movement.UpLeft, to: Movement.Up, when: MovementEvent.KeyupW },
     ]],
-    ["w+s", [
-        { from: "w+s", to: "s", when: "keyup+w" }, 
-        { from: "w+s", to: "w", when: "keyup+s" },
+    // [Movement.None, [
+    //     { from: "w+s", to: "s", when: "keyup+w" }, 
+    //     { from: "w+s", to: "w", when: "keyup+s" },
+    // ]],
+    [Movement.UpRight, [
+        { from: Movement.UpRight, to: Movement.Right, when: MovementEvent.KeyupW }, 
+        { from: Movement.UpRight, to: Movement.Up, when: MovementEvent.KeyupD },
     ]],
-    ["w+d", [
-        { from: "w+d", to: "d", when: "keyup+w" }, 
-        { from: "w+d", to: "w", when: "keyup+d" },
-    ]],
-    ["s+d", [
-        { from: "s+d", to: "d", when: "keyup+s" }, 
-        { from: "s+d", to: "s", when: "keyup+d" },
-    ]],
-    ["s+a", [
-        { from: "s+a", to: "a", when: "keyup+s" }, 
-        { from: "s+a", to: "s", when: "keyup+a" },
-    ]],
-    ["w", [
-        { from: "w", to: "w+s", when: "keydown+s" },
-        { from: "w", to: "w+a", when: "keydown+a" },
-        { from: "w", to: "w+s", when: "keydown+s" },
-        { from: "a", to: "none", when: "keyup+a" }
-    ]],
-    ["a", [
-        { from: "a", to: "w+a", when: "keydown+a" },
-        { from: "a", to: "s+a", when: "keydown+s" },
-        { from: "a", to: "none", when: "keyup+a" }
-    ]],
-    ["s", [
-        { from: "s", to: "s+d", when: "keydown+d" },
-        { from: "s", to: "s+a", when: "keydown+a" },
-        { from: "s", to: "none", when: "keyup+s" }
-    ]],
-    ["d", [
-        { from: "d", to: "s+d", when: "keydown+s" },
-        { from: "d", to: "w+d", when: "keydown+w" },
-        { from: "d", to: "none", when: "keyup+d" }
-    ]],
-    ["none", [
-        { from: "none", to: "a", when: "keydown+a" },
-        { from: "none", to: "w", when: "keydown+w" },
-        { from: "none", to: "s", when: "keydown+s" },
-        { from: "none", to: "d", when: "keydown+d" },
-    ]]
+ //    // ["s+d", [
+    //     { from: "s+d", to: "d", when: "keyup+s" }, 
+    //     { from: "s+d", to: "s", when: "keyup+d" },
+    // ]],
+    // ["s+a", [
+    //     { from: "s+a", to: "a", when: "keyup+s" }, 
+    //     { from: "s+a", to: "s", when: "keyup+a" },
+    // ]],
+    // ["w", [
+    //     { from: "w", to: "w+s", when: "keydown+s" },
+    //     { from: "w", to: "w+a", when: "keydown+a" },
+    //     { from: "w", to: "w+s", when: "keydown+s" },
+    //     { from: "a", to: "none", when: "keyup+a" }
+    // ]],
+    // ["a", [
+    //     { from: "a", to: "w+a", when: "keydown+a" },
+    //     { from: "a", to: "s+a", when: "keydown+s" },
+    //     { from: "a", to: "none", when: "keyup+a" }
+    // ]],
+    // ["s", [
+    //     { from: "s", to: "s+d", when: "keydown+d" },
+    //     { from: "s", to: "s+a", when: "keydown+a" },
+    //     { from: "s", to: "none", when: "keyup+s" }
+    // ]],
+    // ["d", [
+    //     { from: "d", to: "s+d", when: "keydown+s" },
+    //     { from: "d", to: "w+d", when: "keydown+w" },
+    //     { from: "d", to: "none", when: "keyup+d" }
+    // ]],
+    // ["none", [
+    //     { from: "none", to: "a", when: "keydown+a" },
+    //     { from: "none", to: "w", when: "keydown+w" },
+    //     { from: "none", to: "s", when: "keydown+s" }, 
+    //     { from: "none", to: "d", when: "keydown+d" },
+    // ]]
 ]);
+
+function toMovementEvent(event: KeyboardEvent): MovementEvent {
+    return `${event.type}+${event.key}`;
+}
 
 const movementTransitions = stateTransitions(movementStateMachine);
 
 const movement$ =
-    merge(movementKeyDown$, movementKeyUp$)
+    merge(movementKeyDown$.pipe(map()), movementKeyUp$)
             .pipe(
+                filter(isMovementKey),
                 scan(movementTransitions, "none")
             );
 
