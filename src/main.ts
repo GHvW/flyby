@@ -28,6 +28,9 @@ loadSprites(["./assets/Ships/ship_0005.png"])
     });
 
     movement$
+      .pipe(
+        
+      )
   
     planeState$
       .pipe(

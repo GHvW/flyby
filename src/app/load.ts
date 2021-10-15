@@ -8,4 +8,5 @@ function loadSprites(assetPaths: string[]): Promise<Sprite[]> {
         .then(textures => textures.map(initSprite));
 }
 
+
 export { loadSprites };

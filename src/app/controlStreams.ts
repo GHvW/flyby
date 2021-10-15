@@ -35,6 +35,14 @@ function keyToMovement(key: string): Movement {
     }
 }
 
+
+function isMovementKey(keyEvent: KeyboardEvent): boolean {
+    return keyEvent.key === "w" || 
+        keyEvent.key === "a" || 
+        keyEvent.key === "s" || 
+        keyEvent.key === "d";
+}
+
 const mousePosition$: Observable<Coordinate> =
     fromEvent<MouseEvent>(document, "mousemove")
         .pipe(
@@ -45,17 +53,53 @@ const mousePosition$: Observable<Coordinate> =
                 };
             }));
 
-
 const mousedown$ = fromEvent<MouseEvent>(document, "mousedown");
 const mouseup$ = fromEvent<MouseEvent>(document, "mouseup");
 
 const mouseDownAndUp$ = merge(mousedown$, mouseup$);
 
-const movement$: Observable<Movement> = 
-    fromEvent<KeyboardEvent>(document, "keydown")
-        .pipe(
-            filter(event => event.key === "w" || event.key === "a" || event.key === "s" || event.key === "d"),
-            map(compose(keyToMovement, (event) => event.key))
-        );
+const movementKeyDown$ = fromEvent<KeyboardEvent>(document, "keydown").pipe(filter(isMovementKey));
+const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup").pipe(filter(isMovementKey));
 
-export { mousedown$, mouseup$, mouseDownAndUp$, mousePosition$, movement$ };
+type KeyupW = "keyup+w";
+type KeyupA = "keyup+a";
+type KeyupS = "keyup+s";
+type KeyupD = "keyup+d";
+
+type KeydownW = "keydown+w";
+type KeydownA = "keydown+a";
+type KeydownS = "keydown+s";
+type KeydownD = "keydown+d";
+
+type MovementEvents 
+    = KeyupW
+    | KeyupA
+    | KeyupS
+    | KeyupD
+    | KeydownW
+    | KeydownA
+    | KeydownS
+    | KeydownD
+
+
+const movementStateMachine: StateGraph<, MovementEvents> = new Map([
+    ["w+a", []],
+    ["w+s", []],
+    ["w+d", []],
+]);
+
+const movement$ =
+    merge(movementKeyDown$, movementKeyUp$)
+            .pipe(
+                scan()
+            );
+
+// const movement$: Observable<Movement> = 
+//     fromEvent<KeyboardEvent>(document, "keydown")
+//         .pipe(
+//             filter(isMovementKey),
+//             map(compose(keyToMovement, (event) => event.key))
+//         );
+
+
+export { mousedown$, mouseup$, mouseDownAndUp$, mousePosition$, movement$, Movement };
