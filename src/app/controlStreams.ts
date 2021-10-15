@@ -1,7 +1,8 @@
 import { fromEvent, merge, NotFoundError, Observable } from "rxjs";
-import { map, filter } from "rxjs/operators";
+import { map, filter, scan } from "rxjs/operators";
 
 import { Coordinate } from "./coordinate";
+import { StateGraph, stateTransitions } from "./stateGraph";
 import { compose } from "./utils/funkyStuff";
 
 // type Up = "w";
@@ -12,15 +13,19 @@ import { compose } from "./utils/funkyStuff";
 
 enum Movement {
     Up,
+    UpLeft,
+    UpRight,
     Down,
+    DownLeft,
+    DownRight,
     Left,
     Right,
     None
 }
 
-// type Movement = Up | Down | Right | Left | None;
 
-function keyToMovement(key: string): Movement {
+function keyToMovement(key: MovementKeys): Movement {
+    // turn this stuff into a Map
     switch (key) {
         case "w":
             return Movement.Up;
@@ -30,6 +35,16 @@ function keyToMovement(key: string): Movement {
             return Movement.Down;
         case "d":
             return Movement.Right;
+        case "w+d":
+            return Movement.UpRight;
+        case "w+a":
+            return Movement.UpLeft;
+        case "s+a":
+            return Movement.DownLeft;
+        case "s+d":
+            return Movement.DownRight;
+        case "w+s":
+            return Movement.None;
         default:
             return Movement.None;
     }
@@ -82,16 +97,88 @@ type MovementEvents
     | KeydownD
 
 
-const movementStateMachine: StateGraph<, MovementEvents> = new Map([
-    ["w+a", []],
-    ["w+s", []],
-    ["w+d", []],
+type Up = "w";
+type Down = "s";
+type Left = "a";
+type Right = "d";
+type UpLeft = "w+a";
+type UpRight = "w+d";
+type DownLeft = "s+a";
+type DownRight = "s+d";
+type UpDown = "w+s";
+type None = "none";
+
+
+type MovementKeys
+    = Up
+    | Down
+    | Left
+    | Right
+    | UpLeft
+    | UpRight
+    | DownLeft
+    | DownRight
+    | UpDown
+    | None
+
+
+const movementStateMachine: StateGraph<MovementKeys, MovementEvents> = new Map([
+    ["w+a", [
+        { from: "w+a", to: "a", when: "keyup+w" }, 
+        { from: "w+a", to: "w", when: "keyup+a" },
+        { from: "a", to: "none", when: "keyup+a" }
+    ]],
+    ["w+s", [
+        { from: "w+s", to: "s", when: "keyup+w" }, 
+        { from: "w+s", to: "w", when: "keyup+s" },
+    ]],
+    ["w+d", [
+        { from: "w+d", to: "d", when: "keyup+w" }, 
+        { from: "w+d", to: "w", when: "keyup+d" },
+    ]],
+    ["s+d", [
+        { from: "s+d", to: "d", when: "keyup+s" }, 
+        { from: "s+d", to: "s", when: "keyup+d" },
+    ]],
+    ["s+a", [
+        { from: "s+a", to: "a", when: "keyup+s" }, 
+        { from: "s+a", to: "s", when: "keyup+a" },
+    ]],
+    ["w", [
+        { from: "w", to: "w+s", when: "keydown+s" },
+        { from: "w", to: "w+a", when: "keydown+a" },
+        { from: "w", to: "w+s", when: "keydown+s" },
+        { from: "a", to: "none", when: "keyup+a" }
+    ]],
+    ["a", [
+        { from: "a", to: "w+a", when: "keydown+a" },
+        { from: "a", to: "s+a", when: "keydown+s" },
+        { from: "a", to: "none", when: "keyup+a" }
+    ]],
+    ["s", [
+        { from: "s", to: "s+d", when: "keydown+d" },
+        { from: "s", to: "s+a", when: "keydown+a" },
+        { from: "s", to: "none", when: "keyup+s" }
+    ]],
+    ["d", [
+        { from: "d", to: "s+d", when: "keydown+s" },
+        { from: "d", to: "w+d", when: "keydown+w" },
+        { from: "d", to: "none", when: "keyup+d" }
+    ]],
+    ["none", [
+        { from: "none", to: "a", when: "keydown+a" },
+        { from: "none", to: "w", when: "keydown+w" },
+        { from: "none", to: "s", when: "keydown+s" },
+        { from: "none", to: "d", when: "keydown+d" },
+    ]]
 ]);
+
+const movementTransitions = stateTransitions(movementStateMachine);
 
 const movement$ =
     merge(movementKeyDown$, movementKeyUp$)
             .pipe(
-                scan()
+                scan(movementTransitions, "none")
             );
 
 // const movement$: Observable<Movement> = 
