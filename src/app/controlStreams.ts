@@ -138,10 +138,12 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
         { from: Movement.UpLeft, to: Movement.Left, when: MovementEvent.KeyupW }, 
         { from: Movement.UpLeft, to: Movement.Up, when: MovementEvent.KeyupW },
     ]],
-    // [Movement.None, [
-    //     { from: "w+s", to: "s", when: "keyup+w" }, 
-    //     { from: "w+s", to: "w", when: "keyup+s" },
-    // ]],
+    [Movement.None, [
+        { from: Movement.None, to: Movement.Down, when: MovementEvent.KeydownS }, 
+        { from: Movement.None, to: Movement.Up, when: MovementEvent.KeydownW },
+        { from: Movement.None, to: Movement.Right, when: MovementEvent.KeydownD }, 
+        { from: Movement.None, to: Movement.Left, when: MovementEvent.KeydownA },
+    ]],
     [Movement.UpRight, [
         { from: Movement.UpRight, to: Movement.Right, when: MovementEvent.KeyupW }, 
         { from: Movement.UpRight, to: Movement.Up, when: MovementEvent.KeyupD },
@@ -155,36 +157,47 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
         { from: Movement.DownLeft, to: Movement.Down, when: MovementEvent.KeyupA },
     ]],
     [Movement.Up, [
-        // { from: Movement.Up, to: Movement.None, when: "keydown+s" },
+        { from: Movement.Up, to: Movement.None, when: MovementEvent.KeyupW },
         { from: Movement.Up, to: Movement.UpLeft, when: MovementEvent.KeydownA },
         { from: Movement.Up, to: Movement.UpRight, when: MovementEvent.KeydownD },
-        { from: Movement.Up, to: Movement.None, when: MovementEvent.KeyupW }
     ]],
-    // ["a", [
-    //     { from: "a", to: "w+a", when: "keydown+a" },
-    //     { from: "a", to: "s+a", when: "keydown+s" },
-    //     { from: "a", to: "none", when: "keyup+a" }
-    // ]],
-    // ["s", [
-    //     { from: "s", to: "s+d", when: "keydown+d" },
-    //     { from: "s", to: "s+a", when: "keydown+a" },
-    //     { from: "s", to: "none", when: "keyup+s" }
-    // ]],
-    // ["d", [
-    //     { from: "d", to: "s+d", when: "keydown+s" },
-    //     { from: "d", to: "w+d", when: "keydown+w" },
-    //     { from: "d", to: "none", when: "keyup+d" }
-    // ]],
-    // ["none", [
-    //     { from: "none", to: "a", when: "keydown+a" },
-    //     { from: "none", to: "w", when: "keydown+w" },
-    //     { from: "none", to: "s", when: "keydown+s" }, 
-    //     { from: "none", to: "d", when: "keydown+d" },
-    // ]]
+    [Movement.Left, [
+        { from: Movement.Left, to: Movement.None, when: MovementEvent.KeyupA },
+        { from: Movement.Left, to: Movement.UpLeft, when: MovementEvent.KeydownW },
+        { from: Movement.Left, to: Movement.DownLeft, when: MovementEvent.KeydownS }
+    ]],
+    [Movement.Down, [
+        { from: Movement.Down, to: Movement.None, when: MovementEvent.KeyupS },
+        { from: Movement.Down, to: Movement.DownRight, when: MovementEvent.KeydownD },
+        { from: Movement.Down, to: Movement.DownLeft, when: MovementEvent.KeydownA }
+    ]],
+    [Movement.Right, [
+        { from: Movement.Right, to: Movement.None, when: MovementEvent.KeyupD },
+        { from: Movement.Right, to: Movement.UpRight, when: MovementEvent.KeydownW },
+        { from: Movement.Right, to: Movement.DownRight, when: MovementEvent.KeydownS }
+    ]],
+]);
+
+type KeyEventType = "keydown" | "keyup";
+type MovementKey = "w" | "a" | "s" | "d";
+
+const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, MovementEvent>>([
+    ["keydown", new Map([
+        ["w", MovementEvent.KeydownW],
+        ["a", MovementEvent.KeydownA],
+        ["s", MovementEvent.KeydownS],
+        ["d", MovementEvent.KeydownD],
+    ])],
+    ["keyup", new Map([
+        ["w", MovementEvent.KeyupW],
+        ["a", MovementEvent.KeyupA],
+        ["s", MovementEvent.KeyupS],
+        ["d", MovementEvent.KeyupD],
+    ])] 
 ]);
 
 function toMovementEvent(event: KeyboardEvent): MovementEvent {
-    return `${event.type}+${event.key}`;
+    return KeyEventToMovemenEventMap.get(event.type)?.get(event.key) ?? MovementEvent.;
 }
 
 const movementTransitions = stateTransitions(movementStateMachine);
