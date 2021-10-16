@@ -104,7 +104,7 @@ enum MovementEvent {
     KeydownW,
     KeydownA,
     KeydownS,
-    KeydwonD
+    KeydownD
 }
 
 
@@ -155,10 +155,10 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
         { from: Movement.DownLeft, to: Movement.Down, when: MovementEvent.KeyupA },
     ]],
     [Movement.Up, [
-        { from: Movement.Up, to: "w+s", when: "keydown+s" },
-        { from: Movement.Up, to: "w+a", when: "keydown+a" },
-        { from: Movement.Up, to: "w+s", when: "keydown+s" },
-        { from: Movement.Up, to: "none", when: "keyup+a" }
+        // { from: Movement.Up, to: Movement.None, when: "keydown+s" },
+        { from: Movement.Up, to: Movement.UpLeft, when: MovementEvent.KeydownA },
+        { from: Movement.Up, to: Movement.UpRight, when: MovementEvent.KeydownD },
+        { from: Movement.Up, to: Movement.None, when: MovementEvent.KeyupW }
     ]],
     // ["a", [
     //     { from: "a", to: "w+a", when: "keydown+a" },
