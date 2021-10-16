@@ -107,35 +107,52 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
 
 type KeyEventType = "keydown" | "keyup";
 type MovementKey = "w" | "a" | "s" | "d";
-const MovementKeys = new Set(["w", "a", "s", "d"]);
 
 const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, MovementEvent>>([
-    ["keydown", new Map([
-        ["w", MovementEvent.KeydownW],
-        ["a", MovementEvent.KeydownA],
-        ["s", MovementEvent.KeydownS],
-        ["d", MovementEvent.KeydownD],
-    ])],
-    ["keyup", new Map([
-        ["w", MovementEvent.KeyupW],
-        ["a", MovementEvent.KeyupA],
-        ["s", MovementEvent.KeyupS],
-        ["d", MovementEvent.KeyupD],
-    ])] 
+
 ]);
 
 function toMovementEvent(event: KeyboardEvent): MovementEvent | null {
-    if ((event.type === "keydown" || event.type === "keyup") && (MovementKeys.has(event.key)) {
-        return KeyEventToMovemenEventMap.get(event.type)?.get(event.key) ?? MovementEvent.;
+    const key = event.key;
+    const type = event.type;
+    switch (type) {
+        case "keydown": 
+            switch (key) {
+                case "w": 
+                    return MovementEvent.KeydownW;
+                case "a": 
+                    return MovementEvent.KeydownA
+                case "s": 
+                    return MovementEvent.KeydownS;
+                case "d": 
+                    return MovementEvent.KeydownD;
+                default:
+                    return null;
+            }
+        case "keyup": 
+            switch (key) {
+                case "w": 
+                    return MovementEvent.KeyupW;
+                case "a": 
+                    return MovementEvent.KeyupA;
+                case "s": 
+                    return MovementEvent.KeyupS;
+                case "d": 
+                    return MovementEvent.KeyupD;
+                default:
+                    return null;
+            }
+        default:
+            return null;
     }
-    return null;
 }
 
 const movementTransitions = stateTransitions(movementStateMachine);
 
 const movement$ =
-    merge(movementKeyDown$.pipe(map()), movementKeyUp$)
+    merge(movementKeyDown$, movementKeyUp$)
             .pipe(
+                map(toMovementEvent)
                 filter(isMovementKey),
                 scan(movementTransitions, "none")
             );
