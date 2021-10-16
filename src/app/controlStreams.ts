@@ -76,15 +76,15 @@ const mouseDownAndUp$ = merge(mousedown$, mouseup$);
 const movementKeyDown$ = fromEvent<KeyboardEvent>(document, "keydown").pipe(filter(isMovementKey));
 const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup").pipe(filter(isMovementKey));
 
-type KeyupW = "keyup+w";
-type KeyupA = "keyup+a";
-type KeyupS = "keyup+s";
-type KeyupD = "keyup+d";
+// type KeyupW = "keyup+w";
+// type KeyupA = "keyup+a";
+// type KeyupS = "keyup+s";
+// type KeyupD = "keyup+d";
 
-type KeydownW = "keydown+w";
-type KeydownA = "keydown+a";
-type KeydownS = "keydown+s";
-type KeydownD = "keydown+d";
+// type KeydownW = "keydown+w";
+// type KeydownA = "keydown+a";
+// type KeydownS = "keydown+s";
+// type KeydownD = "keydown+d";
 
 // type MovementEvent
 //     = KeyupW
@@ -108,29 +108,29 @@ enum MovementEvent {
 }
 
 
-type Up = "w";
-type Down = "s";
-type Left = "a";
-type Right = "d";
-type UpLeft = "w+a";
-type UpRight = "w+d";
-type DownLeft = "s+a";
-type DownRight = "s+d";
-type UpDown = "w+s";
-type None = "none";
+// type Up = "w";
+// type Down = "s";
+// type Left = "a";
+// type Right = "d";
+// type UpLeft = "w+a";
+// type UpRight = "w+d";
+// type DownLeft = "s+a";
+// type DownRight = "s+d";
+// type UpDown = "w+s";
+// type None = "none";
 
 
-type MovementKey
-    = Up
-    | Down
-    | Left
-    | Right
-    | UpLeft
-    | UpRight
-    | DownLeft
-    | DownRight
-    | UpDown
-    | None
+// type MovementKey
+//     = Up
+//     | Down
+//     | Left
+//     | Right
+//     | UpLeft
+//     | UpRight
+//     | DownLeft
+//     | DownRight
+//     | UpDown
+//     | None
 
 
 const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
@@ -146,20 +146,20 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
         { from: Movement.UpRight, to: Movement.Right, when: MovementEvent.KeyupW }, 
         { from: Movement.UpRight, to: Movement.Up, when: MovementEvent.KeyupD },
     ]],
- //    // ["s+d", [
-    //     { from: "s+d", to: "d", when: "keyup+s" }, 
-    //     { from: "s+d", to: "s", when: "keyup+d" },
-    // ]],
-    // ["s+a", [
-    //     { from: "s+a", to: "a", when: "keyup+s" }, 
-    //     { from: "s+a", to: "s", when: "keyup+a" },
-    // ]],
-    // ["w", [
-    //     { from: "w", to: "w+s", when: "keydown+s" },
-    //     { from: "w", to: "w+a", when: "keydown+a" },
-    //     { from: "w", to: "w+s", when: "keydown+s" },
-    //     { from: "a", to: "none", when: "keyup+a" }
-    // ]],
+    [Movement.DownRight, [
+        { from: Movement.DownRight, to: Movement.Down, when: MovementEvent.KeyupD }, 
+        { from: Movement.DownRight, to: Movement.Right, when: MovementEvent.KeyupS },
+    ]],
+    [Movement.DownLeft, [
+        { from: Movement.DownLeft, to: Movement.Left, when: MovementEvent.KeyupS }, 
+        { from: Movement.DownLeft, to: Movement.Down, when: MovementEvent.KeyupA },
+    ]],
+    [Movement.Up, [
+        { from: Movement.Up, to: "w+s", when: "keydown+s" },
+        { from: Movement.Up, to: "w+a", when: "keydown+a" },
+        { from: Movement.Up, to: "w+s", when: "keydown+s" },
+        { from: Movement.Up, to: "none", when: "keyup+a" }
+    ]],
     // ["a", [
     //     { from: "a", to: "w+a", when: "keydown+a" },
     //     { from: "a", to: "s+a", when: "keydown+s" },
