@@ -5,11 +5,6 @@ import { Coordinate } from "./coordinate";
 import { StateGraph, stateTransitions } from "./stateGraph";
 import { compose } from "./utils/funkyStuff";
 
-// type Up = "w";
-// type Down = "s";
-// type Right = "d";
-// type Left = "a";
-// type None = null;
 
 enum Movement {
     Up,
@@ -24,39 +19,13 @@ enum Movement {
 }
 
 
-function keyToMovement(key: MovementKeys): Movement {
-    // turn this stuff into a Map
-    switch (key) {
-        case "w":
-            return Movement.Up;
-        case "a":
-            return Movement.Left;
-        case "s":
-            return Movement.Down;
-        case "d":
-            return Movement.Right;
-        case "w+d":
-            return Movement.UpRight;
-        case "w+a":
-            return Movement.UpLeft;
-        case "s+a":
-            return Movement.DownLeft;
-        case "s+d":
-            return Movement.DownRight;
-        case "w+s":
-            return Movement.None;
-        default:
-            return Movement.None;
-    }
-}
-
-
 function isMovementKey(keyEvent: KeyboardEvent): boolean {
     return keyEvent.key === "w" || 
         keyEvent.key === "a" || 
         keyEvent.key === "s" || 
         keyEvent.key === "d";
 }
+
 
 const mousePosition$: Observable<Coordinate> =
     fromEvent<MouseEvent>(document, "mousemove")
@@ -68,6 +37,7 @@ const mousePosition$: Observable<Coordinate> =
                 };
             }));
 
+
 const mousedown$ = fromEvent<MouseEvent>(document, "mousedown");
 const mouseup$ = fromEvent<MouseEvent>(document, "mouseup");
 
@@ -76,25 +46,6 @@ const mouseDownAndUp$ = merge(mousedown$, mouseup$);
 const movementKeyDown$ = fromEvent<KeyboardEvent>(document, "keydown").pipe(filter(isMovementKey));
 const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup").pipe(filter(isMovementKey));
 
-// type KeyupW = "keyup+w";
-// type KeyupA = "keyup+a";
-// type KeyupS = "keyup+s";
-// type KeyupD = "keyup+d";
-
-// type KeydownW = "keydown+w";
-// type KeydownA = "keydown+a";
-// type KeydownS = "keydown+s";
-// type KeydownD = "keydown+d";
-
-// type MovementEvent
-//     = KeyupW
-//     | KeyupA
-//     | KeyupS
-//     | KeyupD
-//     | KeydownW
-//     | KeydownA
-//     | KeydownS
-//     | KeydownD
 
 enum MovementEvent {
     KeyupW,
@@ -106,31 +57,6 @@ enum MovementEvent {
     KeydownS,
     KeydownD
 }
-
-
-// type Up = "w";
-// type Down = "s";
-// type Left = "a";
-// type Right = "d";
-// type UpLeft = "w+a";
-// type UpRight = "w+d";
-// type DownLeft = "s+a";
-// type DownRight = "s+d";
-// type UpDown = "w+s";
-// type None = "none";
-
-
-// type MovementKey
-//     = Up
-//     | Down
-//     | Left
-//     | Right
-//     | UpLeft
-//     | UpRight
-//     | DownLeft
-//     | DownRight
-//     | UpDown
-//     | None
 
 
 const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
@@ -178,8 +104,10 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
     ]],
 ]);
 
+
 type KeyEventType = "keydown" | "keyup";
 type MovementKey = "w" | "a" | "s" | "d";
+const MovementKeys = new Set(["w", "a", "s", "d"]);
 
 const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, MovementEvent>>([
     ["keydown", new Map([
@@ -196,8 +124,11 @@ const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, Movemen
     ])] 
 ]);
 
-function toMovementEvent(event: KeyboardEvent): MovementEvent {
-    return KeyEventToMovemenEventMap.get(event.type)?.get(event.key) ?? MovementEvent.;
+function toMovementEvent(event: KeyboardEvent): MovementEvent | null {
+    if ((event.type === "keydown" || event.type === "keyup") && (MovementKeys.has(event.key)) {
+        return KeyEventToMovemenEventMap.get(event.type)?.get(event.key) ?? MovementEvent.;
+    }
+    return null;
 }
 
 const movementTransitions = stateTransitions(movementStateMachine);
