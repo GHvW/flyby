@@ -55,7 +55,8 @@ enum MovementEvent {
     KeydownW,
     KeydownA,
     KeydownS,
-    KeydownD
+    KeydownD,
+    None
 }
 
 
@@ -112,7 +113,7 @@ const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, Movemen
 
 ]);
 
-function toMovementEvent(event: KeyboardEvent): MovementEvent | null {
+function toMovementEvent(event: KeyboardEvent): MovementEvent {
     const key = event.key;
     const type = event.type;
     switch (type) {
@@ -127,7 +128,7 @@ function toMovementEvent(event: KeyboardEvent): MovementEvent | null {
                 case "d": 
                     return MovementEvent.KeydownD;
                 default:
-                    return null;
+                    return MovementEvent.None;
             }
         case "keyup": 
             switch (key) {
@@ -140,10 +141,10 @@ function toMovementEvent(event: KeyboardEvent): MovementEvent | null {
                 case "d": 
                     return MovementEvent.KeyupD;
                 default:
-                    return null;
+                    return MovementEvent.None;
             }
         default:
-            return null;
+            return MovementEvent.None;
     }
 }
 
@@ -152,17 +153,9 @@ const movementTransitions = stateTransitions(movementStateMachine);
 const movement$ =
     merge(movementKeyDown$, movementKeyUp$)
             .pipe(
-                map(toMovementEvent)
-                filter(isMovementKey),
-                scan(movementTransitions, "none")
+                map(toMovementEvent),
+                scan(movementTransitions, Movement.None)
             );
-
-// const movement$: Observable<Movement> = 
-//     fromEvent<KeyboardEvent>(document, "keydown")
-//         .pipe(
-//             filter(isMovementKey),
-//             map(compose(keyToMovement, (event) => event.key))
-//         );
 
 
 export { mousedown$, mouseup$, mouseDownAndUp$, mousePosition$, movement$, Movement };
