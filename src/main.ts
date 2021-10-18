@@ -7,7 +7,7 @@ import './style.css'
 import { loadSprites } from './app/load';
 import { Sprite } from './app/sprite';
 import { render } from './app/render';
-import { movement$ } from './app/controlStreams';
+import { Movement, movement$ } from './app/controlStreams';
 
  // TODO - actually error handle these
 const canvas: HTMLCanvasElement = document.querySelector('#canvas')!; // yikes!
@@ -28,9 +28,26 @@ loadSprites(["./assets/Ships/ship_0005.png"])
     });
 
     movement$
-      .pipe(
-        
-      )
+      .subscribe((it) => {
+        if (it === Movement.Down)
+          console.log("down");
+        else if (it === Movement.DownLeft)
+          console.log("down+left diagonal");
+        else if (it === Movement.DownRight)
+          console.log("down+right diagonal");
+        else if (it === Movement.Left)
+          console.log("left");
+        else if (it === Movement.UpLeft)
+          console.log("up+left diagonal");
+        else if (it === Movement.UpRight)
+          console.log("up+right diagonal");
+        else if (it === Movement.Up)
+          console.log("up");
+        else if (it === Movement.Right)
+          console.log("right");
+        else
+          console.log("none");
+      });
   
     planeState$
       .pipe(
