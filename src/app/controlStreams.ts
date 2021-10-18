@@ -31,14 +31,6 @@ enum MovementEvent {
 }
 
 
-function isMovementKey(keyEvent: KeyboardEvent): boolean {
-    return keyEvent.key === "w" || 
-        keyEvent.key === "a" || 
-        keyEvent.key === "s" || 
-        keyEvent.key === "d";
-}
-
-
 const mousePosition$: Observable<Coordinate> =
     fromEvent<MouseEvent>(document, "mousemove")
         .pipe(
@@ -55,8 +47,8 @@ const mouseup$ = fromEvent<MouseEvent>(document, "mouseup");
 
 const mouseDownAndUp$ = merge(mousedown$, mouseup$);
 
-const movementKeyDown$ = fromEvent<KeyboardEvent>(document, "keydown").pipe(filter(isMovementKey));
-const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup").pipe(filter(isMovementKey));
+const movementKeyDown$ = fromEvent<KeyboardEvent>(document, "keydown");
+const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup");
 
 
 const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
