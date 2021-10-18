@@ -1,9 +1,8 @@
-import { fromEvent, merge, NotFoundError, Observable } from "rxjs";
+import { fromEvent, merge, Observable } from "rxjs";
 import { map, filter, scan } from "rxjs/operators";
 
 import { Coordinate } from "./coordinate";
 import { StateGraph, stateTransitions } from "./stateGraph";
-import { compose } from "./utils/funkyStuff";
 
 
 enum Movement {
@@ -15,6 +14,19 @@ enum Movement {
     DownRight,
     Left,
     Right,
+    None
+}
+
+
+enum MovementEvent {
+    KeyupW,
+    KeyupA,
+    KeyupS,
+    KeyupD,
+    KeydownW,
+    KeydownA,
+    KeydownS,
+    KeydownD,
     None
 }
 
@@ -45,19 +57,6 @@ const mouseDownAndUp$ = merge(mousedown$, mouseup$);
 
 const movementKeyDown$ = fromEvent<KeyboardEvent>(document, "keydown").pipe(filter(isMovementKey));
 const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup").pipe(filter(isMovementKey));
-
-
-enum MovementEvent {
-    KeyupW,
-    KeyupA,
-    KeyupS,
-    KeyupD,
-    KeydownW,
-    KeydownA,
-    KeydownS,
-    KeydownD,
-    None
-}
 
 
 const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
@@ -105,13 +104,6 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
     ]],
 ]);
 
-
-type KeyEventType = "keydown" | "keyup";
-type MovementKey = "w" | "a" | "s" | "d";
-
-const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, MovementEvent>>([
-
-]);
 
 function toMovementEvent(event: KeyboardEvent): MovementEvent {
     const key = event.key;
