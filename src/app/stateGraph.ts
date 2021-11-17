@@ -6,15 +6,20 @@ interface Transition<A, B> {
     when: B;
 }
 
+interface StateTransitions<A, B> {
+    from: A;
+    transitions: Array<{ to: A, when: B }>
+}
 
-type StateGraph<A, B> = Map<A, Array<Transition<A, B>>>;
+type StateGraph<A, B> = Map<A, StateTransitions<A, B>>;
 
 
 function stateTransitions<A, B>(states: StateGraph<A, B>): (state: A, event: B) => A {
     return (state, event) => {
         return states.get(state)
+            ?.transitions
             ?.find(transition => transition.when === event)
-            ?.to 
+            ?.to
             ?? state;
     }
 }
