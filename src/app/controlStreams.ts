@@ -11,6 +11,40 @@ import { compose } from "./utils/funkyStuff";
 // type Left = "a";
 // type None = null;
 
+enum MovementEvent {
+    KeyupW,
+    KeyupA,
+    KeyupS,
+    KeyupD,
+    KeydownW,
+    KeydownA,
+    KeydownS,
+    KeydownD,
+    None
+}
+
+
+enum MovementCombination {
+    Up,
+    UpLeft,
+    UpRight,
+    UpLeftRight,
+    UpLeftRightDown,
+    UpLeftDown,
+    UpRightDown,
+    UpDown,
+    Down,
+    DownLeft,
+    DownRight,
+    DownLeftRight,
+    Left,
+    Right,
+    LeftRight,
+    None
+}
+
+
+// substet of MovementCombination
 enum Movement {
     Up,
     UpLeft,
@@ -21,41 +55,6 @@ enum Movement {
     Left,
     Right,
     None
-}
-
-
-function keyToMovement(key: MovementKeys): Movement {
-    // turn this stuff into a Map
-    switch (key) {
-        case "w":
-            return Movement.Up;
-        case "a":
-            return Movement.Left;
-        case "s":
-            return Movement.Down;
-        case "d":
-            return Movement.Right;
-        case "w+d":
-            return Movement.UpRight;
-        case "w+a":
-            return Movement.UpLeft;
-        case "s+a":
-            return Movement.DownLeft;
-        case "s+d":
-            return Movement.DownRight;
-        case "w+s":
-            return Movement.None;
-        default:
-            return Movement.None;
-    }
-}
-
-
-function isMovementKey(keyEvent: KeyboardEvent): boolean {
-    return keyEvent.key === "w" ||
-        keyEvent.key === "a" ||
-        keyEvent.key === "s" ||
-        keyEvent.key === "d";
 }
 
 const mousePosition$: Observable<Coordinate> =
@@ -95,17 +94,6 @@ const movementKeyUp$ = fromEvent<KeyboardEvent>(document, "keyup").pipe(filter(i
 //     | KeydownA
 //     | KeydownS
 //     | KeydownD
-
-enum MovementEvent {
-    KeyupW,
-    KeyupA,
-    KeyupS,
-    KeyupD,
-    KeydownW,
-    KeydownA,
-    KeydownS,
-    KeydownD
-}
 
 
 // type Up = "w";
@@ -168,25 +156,71 @@ const movementStateMachine: StateGraph<Movement, MovementEvent> = new Map([
         { from: Movement.DownLeft, to: Movement.Left, when: MovementEvent.KeyupS },
         { from: Movement.DownLeft, to: Movement.Down, when: MovementEvent.KeyupA },
     ]],
-    [Movement.Up, [
-        { from: Movement.Up, to: Movement.None, when: MovementEvent.KeyupW },
-        { from: Movement.Up, to: Movement.UpLeft, when: MovementEvent.KeydownA },
-        { from: Movement.Up, to: Movement.UpRight, when: MovementEvent.KeydownD },
+    [MovementCombination.Up, [
+        { from: MovementCombination.Up, to: MovementCombination.None, when: MovementEvent.KeyupW },
+        { from: MovementCombination.Up, to: MovementCombination.UpLeft, when: MovementEvent.KeydownA },
+        { from: MovementCombination.Up, to: MovementCombination.UpRight, when: MovementEvent.KeydownD },
+        { from: MovementCombination.Up, to: MovementCombination.UpDown, when: MovementEvent.KeydownS },
     ]],
-    [Movement.Left, [
-        { from: Movement.Left, to: Movement.None, when: MovementEvent.KeyupA },
-        { from: Movement.Left, to: Movement.UpLeft, when: MovementEvent.KeydownW },
-        { from: Movement.Left, to: Movement.DownLeft, when: MovementEvent.KeydownS }
+    [MovementCombination.Left, [
+        { from: MovementCombination.Left, to: MovementCombination.None, when: MovementEvent.KeyupA },
+        { from: MovementCombination.Left, to: MovementCombination.UpLeft, when: MovementEvent.KeydownW },
+        { from: MovementCombination.Left, to: MovementCombination.DownLeft, when: MovementEvent.KeydownS },
+        { from: MovementCombination.Left, to: MovementCombination.LeftRight, when: MovementEvent.KeydownD },
     ]],
-    [Movement.Down, [
-        { from: Movement.Down, to: Movement.None, when: MovementEvent.KeyupS },
-        { from: Movement.Down, to: Movement.DownRight, when: MovementEvent.KeydownD },
-        { from: Movement.Down, to: Movement.DownLeft, when: MovementEvent.KeydownA }
+    [MovementCombination.Down, [
+        { from: MovementCombination.Down, to: MovementCombination.None, when: MovementEvent.KeyupS },
+        { from: MovementCombination.Down, to: MovementCombination.DownRight, when: MovementEvent.KeydownD },
+        { from: MovementCombination.Down, to: MovementCombination.DownLeft, when: MovementEvent.KeydownA },
+        { from: MovementCombination.Down, to: MovementCombination.UpDown, when: MovementEvent.KeydownW },
     ]],
-    [Movement.Right, [
-        { from: Movement.Right, to: Movement.None, when: MovementEvent.KeyupD },
-        { from: Movement.Right, to: Movement.UpRight, when: MovementEvent.KeydownW },
-        { from: Movement.Right, to: Movement.DownRight, when: MovementEvent.KeydownS }
+    [MovementCombination.Right, [
+        { from: MovementCombination.Right, to: MovementCombination.None, when: MovementEvent.KeyupD },
+        { from: MovementCombination.Right, to: MovementCombination.UpRight, when: MovementEvent.KeydownW },
+        { from: MovementCombination.Right, to: MovementCombination.DownRight, when: MovementEvent.KeydownS },
+        { from: MovementCombination.Right, to: MovementCombination.LeftRight, when: MovementEvent.KeydownA },
+    ]],
+    [MovementCombination.UpLeftRight, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
+    ]],
+    [MovementCombination.UpLeftRightDown, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
+    ]],
+    [MovementCombination.UpDown, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
+    ]],
+    [MovementCombination.LeftRight, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
+    ]],
+    [MovementCombination.UpLeftDown, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
+    ]],
+    [MovementCombination.UpRightDown, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
+    ]],
+    [MovementCombination.DownLeftRight, [
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Left, when: MovementEvent.KeyupW }, 
+        // { from: MovementCombination.UpLeft, to: MovementCombination.Up, when: MovementEvent.KeyupA },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftRight, when: MovementEvent.KeydownD },
+        // { from: MovementCombination.UpLeft, to: MovementCombination.UpLeftDown, when: MovementEvent.KeydownS },
     ]],
 ]);
 
@@ -208,11 +242,44 @@ const KeyEventToMovemenEventMap = new Map<KeyEventType, Map<MovementKey, Movemen
     ])]
 ]);
 
+function comboToMove(combo: MovementCombination): Movement {
+    switch (combo) {
+        case MovementCombination.Up:
+            return Movement.Up;
+        case MovementCombination.UpRight:
+            return Movement.UpRight;
+        case MovementCombination.UpLeft:
+            return Movement.UpLeft;
+        case MovementCombination.UpLeftRight:
+            return Movement.Up;
+        case MovementCombination.UpLeftRightDown:
+            return Movement.None;
+        case MovementCombination.UpLeftDown:
+            return Movement.Left;
+        case MovementCombination.UpRightDown:
+            return Movement.Right;
+        case MovementCombination.DownLeftRight:
+            return Movement.Down;
+        case MovementCombination.Down:
+            return Movement.Down;
+        case MovementCombination.DownLeft:
+            return Movement.DownLeft;
+        case MovementCombination.DownRight:
+            return Movement.DownRight;
+        case MovementCombination.Left:
+            return Movement.Left;
+        case MovementCombination.Right:
+            return Movement.Right;
+    }
+    return Movement.None;
+}
+
+
 function toMovementEvent(event: KeyboardEvent): MovementEvent {
     return KeyEventToMovemenEventMap.get(event.type).get(event.key) ?? MovementEvent.;
 }
 
-const movementTransitions = stateTransitions(movementStateMachine);
+const movementTransition = stateTransitions(movementStateMachine);
 
 const movement$ =
     merge(movementKeyDown$.pipe(map()), movementKeyUp$)
