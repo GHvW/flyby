@@ -276,6 +276,7 @@ const movement$ =
     merge(movementKeyDown$, movementKeyUp$) // KeyEvents
         .pipe(
             scan(movementMachine, MoveKeyCombo.None), // state machine over movementcombinations
+            // bufferCount(2, 1) get buffers of [combo, combo] that slide [1, 2] -> [2, 3] -> [3, 4]
             map(comboToMove) // map to actual on screen movement direction
         );
 
