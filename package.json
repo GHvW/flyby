@@ -4,11 +4,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "vitest"
   },
   "devDependencies": {
     "typescript": "^4.3.2",
-    "vite": "^2.6.0"
+    "vite": "^2.6.0",
+    "vitest": "^0.1.16"
   },
   "dependencies": {
     "rxjs": "^7.3.1"

@@ -1,5 +1,5 @@
 import { fromEvent, merge, NotFoundError, Observable } from "rxjs";
-import { map, filter, scan } from "rxjs/operators";
+import { map, filter, scan, tap } from "rxjs/operators";
 
 import { Coordinate } from "./coordinate";
 import { StateGraph, stateTransitions } from "./stateGraph";
@@ -101,14 +101,22 @@ const movementKeyDown$: Observable<MovementEvent> =
     fromEvent<KeyboardEvent>(document, "keydown")
         .pipe(
             filter(isMovementKey(movementForNow)),
-            map(x => movementDownEventMap.get(x.key) || MovementEvent.None));
+            map(x => {
+                // console.log("down ", x.key);
+                return movementDownEventMap.get(x.key) ?? MovementEvent.None;
+            }));
 
 
 const movementKeyUp$: Observable<MovementEvent> = 
     fromEvent<KeyboardEvent>(document, "keyup")
         .pipe(
             filter(isMovementKey(movementForNow)),
-            map(x => movementDownEventMap.get(x.key) || MovementEvent.None));
+            map(x => {
+                const movement = movementUpEventMap.get(x.key) ?? MovementEvent.None;
+                // console.log(`movementEvent ${movement}, ${x.key} up`);
+                return movement;
+                // return movementUpEventMap.get(x.key) || MovementEvent.None
+            }));
 
 
 const movementStateGraph: StateGraph<MoveKeyCombo, MovementEvent> = new Map([
@@ -188,7 +196,7 @@ const movementStateGraph: StateGraph<MoveKeyCombo, MovementEvent> = new Map([
         from: MoveKeyCombo.UpLeftRight, transitions: [
             { to: MoveKeyCombo.LeftRight, when: MovementEvent.KeyupUp }, 
             { to: MoveKeyCombo.UpRight, when: MovementEvent.KeyupLeft },
-            { to: MoveKeyCombo.UpLeft, when: MovementEvent.KeydownRight },
+            { to: MoveKeyCombo.UpLeft, when: MovementEvent.KeyupRight },
             { to: MoveKeyCombo.UpLeftRightDown, when: MovementEvent.KeydownDown },
         ]
     }],
@@ -244,6 +252,7 @@ const movementStateGraph: StateGraph<MoveKeyCombo, MovementEvent> = new Map([
 
 
 function comboToMove(combo: MoveKeyCombo): Movement {
+    // console.log("MoveKeyCombo ", combo);
     switch (combo) {
         case MoveKeyCombo.Up:
             return Movement.Up;
@@ -251,6 +260,8 @@ function comboToMove(combo: MoveKeyCombo): Movement {
             return Movement.UpRight;
         case MoveKeyCombo.UpLeft:
             return Movement.UpLeft;
+        case MoveKeyCombo.UpDown:
+            return Movement.None;
         case MoveKeyCombo.UpLeftRight:
             return Movement.Up;
         case MoveKeyCombo.UpLeftRightDown:
@@ -285,8 +296,9 @@ const movement$ =
         .pipe(
             scan(movementMachine, MoveKeyCombo.None), // state machine over movementcombinations
             // bufferCount(2, 1) get buffers of [combo, combo] that slide [1, 2] -> [2, 3] -> [3, 4]
+            // tap(x => console.log(`machine result: ${x}`)),
             map(comboToMove) // map to actual on screen movement direction
         );
 
 
-export { mousedown$, mouseup$, mouseDownAndUp$, mousePosition$, movement$, Movement };
+export { mousedown$, mouseup$, mouseDownAndUp$, mousePosition$, movement$, Movement, MoveKeyCombo, MovementEvent, movementStateGraph };

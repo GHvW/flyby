@@ -7,11 +7,18 @@ import './style.css'
 import { loadSprites } from './app/load';
 import { Sprite } from './app/sprite';
 import { render } from './app/render';
-import { Movement, movement$ } from './app/controlStreams';
+import { MoveKeyCombo, Movement, movement$, MovementEvent, movementStateGraph } from './app/controlStreams';
+import { stateTransitions } from './app/stateGraph';
 
  // TODO - actually error handle these
 const canvas: HTMLCanvasElement = document.querySelector('#canvas')!; // yikes!
 const canvasCtx: CanvasRenderingContext2D = canvas.getContext('2d')!; // yikes!
+
+const machine = stateTransitions(movementStateGraph);
+
+const result = machine(MoveKeyCombo.Up, MovementEvent.KeyupUp);
+
+console.log("result of transition is ", result.toString());
 
 // ship 5
 // const ship = new Image();

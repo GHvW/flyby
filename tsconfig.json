@@ -13,6 +13,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,            /* Include 'undefined' in index signature results */
+    // "noPropertyAccessFromIndexSignature": true,  /* Require undeclared properties from index signatures to use element accesses. */
 
     "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */ 
     /* strict typechecking */
@@ -21,6 +23,7 @@
     "strictFunctionTypes": true,           /* Enable strict checking of function types. */
     "strictPropertyInitialization": true,  /* Enable strict checking of property initialization in classes. */
     "noImplicitThis": true,                /* Raise error on 'this' expressions with an implied 'any' type. */
+    // "strictFunctionTypes": true,                 /* Enable strict checking of function types. */
     "alwaysStrict": true,                  /* Parse in strict mode and emit "use strict" for each source file. */
   },
   "include": ["./src"]
