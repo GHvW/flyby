@@ -112,20 +112,20 @@ const movementKeyUp$: Observable<MovementEvent> =
 
 
 const movementStateGraph: StateGraph<MoveKeyCombo, MovementEvent> = new Map([
-    [MoveKeyCombo.UpLeft, {
-        from: MoveKeyCombo.UpLeft, transitions: [
-            { to: MoveKeyCombo.Left, when: MovementEvent.KeyupUp },
-            { to: MoveKeyCombo.Up, when: MovementEvent.KeyupLeft },
-            { to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeydownRight },
-            { to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownDown }
-        ]
-    }],
     [MoveKeyCombo.None, {
         from: MoveKeyCombo.None, transitions: [
             { to: MoveKeyCombo.Down, when: MovementEvent.KeydownDown },
             { to: MoveKeyCombo.Up, when: MovementEvent.KeydownUp },
             { to: MoveKeyCombo.Right, when: MovementEvent.KeydownRight },
             { to: MoveKeyCombo.Left, when: MovementEvent.KeydownLeft }
+        ]
+    }],
+    [MoveKeyCombo.UpLeft, {
+        from: MoveKeyCombo.UpLeft, transitions: [
+            { to: MoveKeyCombo.Left, when: MovementEvent.KeyupUp },
+            { to: MoveKeyCombo.Up, when: MovementEvent.KeyupLeft },
+            { to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeydownRight },
+            { to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownDown }
         ]
     }],
     [MoveKeyCombo.UpRight, {
@@ -152,52 +152,62 @@ const movementStateGraph: StateGraph<MoveKeyCombo, MovementEvent> = new Map([
             { to: MoveKeyCombo.DownLeftRight, when: MovementEvent.KeydownRight },
         ]
     }],
-    // [Movement.Up, {
-    //     from: Movement.Up, transitions: [
-    //         { to: MoveKeyCombo.None, when: MovementEvent.KeyupUp },
-    //         { to: MoveKeyCombo.UpLeft, when: MovementEvent.KeydownLeft },
-    //         { to: MoveKeyCombo.UpRight, when: MovementEvent.KeydownRight },
-    //         { to: MoveKeyCombo.UpDown, when: MovementEvent.KeydownRight },
-    //     ]
-    // }],
-    // [Movement.Left, {
-    //     from: Movement.Left, transitions: [
-    //         { to: MoveKeyCombo.None, when: MovementEvent.KeyupLeft },
-    //         { to: Movement.UpLeft, when: MovementEvent.KeydownUp },
-    //         { to: Movement.DownLeft, when: MovementEvent.KeydownDown },
-    //         { to: Movement.LeftRight, when: MovementEvent.KeydownRight },
-    //     ]
-    // }],
-    // [MoveKeyCombo.Down, [
-    //     { from: MoveKeyCombo.Down, to: MoveKeyCombo.None, when: MovementEvent.KeyupDown },
-    //     { from: MoveKeyCombo.Down, to: MoveKeyCombo.DownRight, when: MovementEvent.KeydownD },
-    //     { from: MoveKeyCombo.Down, to: MoveKeyCombo.DownLeft, when: MovementEvent.KeydownA },
-    //     { from: MoveKeyCombo.Down, to: MoveKeyCombo.UpDown, when: MovementEvent.KeydownW },
-    // ]],
-    // [MoveKeyCombo.Right, [
-    //     { from: MoveKeyCombo.Right, to: MoveKeyCombo.None, when: MovementEvent.KeyupD },
-    //     { from: MoveKeyCombo.Right, to: MoveKeyCombo.UpRight, when: MovementEvent.KeydownW },
-    //     { from: MoveKeyCombo.Right, to: MoveKeyCombo.DownRight, when: MovementEvent.KeydownS },
-    //     { from: MoveKeyCombo.Right, to: MoveKeyCombo.LeftRight, when: MovementEvent.KeydownA },
-    // ]],
-    // [MoveKeyCombo.UpLeftRight, [
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Left, when: MovementEvent.KeyupUp }, 
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Up, when: MovementEvent.KeyupLeft },
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeydownD },
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownS },
-    // ]],
-    // [MoveKeyCombo.UpLeftRightDown, [
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Left, when: MovementEvent.KeyupUp }, 
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Up, when: MovementEvent.KeyupLeft },
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeydownD },
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownS },
-    // ]],
-    // [MoveKeyCombo.UpDown, [
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Left, when: MovementEvent.KeyupUp }, 
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Up, when: MovementEvent.KeyupLeft },
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeydownD },
-    //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownS },
-    // ]],
+    [MoveKeyCombo.Up, {
+        from: MoveKeyCombo.Up, transitions: [
+            { to: MoveKeyCombo.None, when: MovementEvent.KeyupUp },
+            { to: MoveKeyCombo.UpLeft, when: MovementEvent.KeydownLeft },
+            { to: MoveKeyCombo.UpRight, when: MovementEvent.KeydownRight },
+            { to: MoveKeyCombo.UpDown, when: MovementEvent.KeydownDown },
+        ]
+    }],
+    [MoveKeyCombo.Left, {
+        from: MoveKeyCombo.Left, transitions: [
+            { to: MoveKeyCombo.None, when: MovementEvent.KeyupLeft },
+            { to: MoveKeyCombo.UpLeft, when: MovementEvent.KeydownUp },
+            { to: MoveKeyCombo.DownLeft, when: MovementEvent.KeydownDown },
+            { to: MoveKeyCombo.LeftRight, when: MovementEvent.KeydownRight },
+        ]
+    }],
+    [MoveKeyCombo.Down, {
+        from: MoveKeyCombo.Down, transitions: [
+            { to: MoveKeyCombo.None, when: MovementEvent.KeyupDown },
+            { to: MoveKeyCombo.DownRight, when: MovementEvent.KeydownRight },
+            { to: MoveKeyCombo.DownLeft, when: MovementEvent.KeydownLeft },
+            { to: MoveKeyCombo.UpDown, when: MovementEvent.KeydownUp },
+        ]
+    }],
+    [MoveKeyCombo.Right, {
+        from: MoveKeyCombo.Right, transitions: [
+            { to: MoveKeyCombo.None, when: MovementEvent.KeyupRight },
+            { to: MoveKeyCombo.UpRight, when: MovementEvent.KeydownUp },
+            { to: MoveKeyCombo.DownRight, when: MovementEvent.KeydownDown },
+            { to: MoveKeyCombo.LeftRight, when: MovementEvent.KeydownLeft },
+        ]
+    }],
+    [MoveKeyCombo.UpLeftRight, {
+        from: MoveKeyCombo.UpLeftRight, transitions: [
+            { to: MoveKeyCombo.LeftRight, when: MovementEvent.KeyupUp }, 
+            { to: MoveKeyCombo.UpRight, when: MovementEvent.KeyupLeft },
+            { to: MoveKeyCombo.UpLeft, when: MovementEvent.KeydownRight },
+            { to: MoveKeyCombo.UpLeftRightDown, when: MovementEvent.KeydownDown },
+        ]
+    }],
+    [MoveKeyCombo.UpLeftRightDown, {
+        from: MoveKeyCombo.UpLeftRightDown, transitions: [
+            { to: MoveKeyCombo.DownLeftRight, when: MovementEvent.KeyupUp }, 
+            { to: MoveKeyCombo.UpRightDown, when: MovementEvent.KeyupLeft },
+            { to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeyupRight },
+            { to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeyupDown },
+        ]
+    }],
+    [MoveKeyCombo.UpDown, {
+        from: MoveKeyCombo.UpDown, transitions: [
+            { to: MoveKeyCombo.Down , when: MovementEvent.KeyupUp }, 
+            { to: MoveKeyCombo.Up, when: MovementEvent.KeyupDown },
+            { to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownLeft },
+            { to: MoveKeyCombo.UpRightDown, when: MovementEvent.KeydownRight },
+        ]
+    }],
     // [MoveKeyCombo.LeftRight, [
     //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Left, when: MovementEvent.KeyupUp }, 
     //     // { from: MoveKeyCombo.UpLeft, to: MoveKeyCombo.Up, when: MovementEvent.KeyupLeft },
@@ -261,6 +271,7 @@ function comboToMove(combo: MoveKeyCombo): Movement {
 const movementMachine: (mkc: MoveKeyCombo, me: MovementEvent) => MoveKeyCombo = stateTransitions(movementStateGraph);
 
 
+// NOTE ************ might need to window last movekeycombo with next one to know what to do ***************
 const movement$ =
     merge(movementKeyDown$, movementKeyUp$) // KeyEvents
         .pipe(
