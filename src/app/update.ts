@@ -4,10 +4,11 @@ import { Sprite } from "./sprite";
 import { GameWorld } from "./world";
 
 function update(world: GameWorld, [time, movement]: [GameTime, Movement]): GameWorld {
+
+    // generator map might be nice here
     const newSprites: Sprite[] = world.sprites.map(sprite => { 
         let coords = sprite.coordinates;
         let newCoords = coords;
-        // console.log("new coords: ", newCoords);
 
         if (movement === Movement.Down) {
         newCoords = { x: coords.x, y: coords.y + 1 };
@@ -39,3 +40,5 @@ function update(world: GameWorld, [time, movement]: [GameTime, Movement]): GameW
 
     return { sprites: newSprites };
 }
+
+export { update };
