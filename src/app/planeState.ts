@@ -22,8 +22,16 @@ type PlaneStateMouseEvents = MouseUp | MouseDown;
 
 
 const states: StateGraph<PlaneState, PlaneStateMouseEvents> = new Map([
-    ["idle", [{ from: "idle", to: "firing", when: "mousedown" }]],
-    ["firing", [{ from: "firing", to: "idle", when: "mouseup" }]],
+    ["idle", { 
+        from: "idle", transitions: [
+            {to: "firing", when: "mousedown" }
+        ]
+    }],
+    ["firing", { 
+        from: "firing", transitions: [
+            { to: "idle", when: "mouseup" }
+        ]
+    }],
 ]);
 
 // (state, event) => state
