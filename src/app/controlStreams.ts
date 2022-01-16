@@ -1,5 +1,5 @@
-import { fromEvent, merge, NotFoundError, Observable } from "rxjs";
-import { map, filter, scan, tap } from "rxjs/operators";
+import { fromEvent, merge, NotFoundError, Observable, of } from "rxjs";
+import { map, filter, scan, distinctUntilChanged, tap } from "rxjs/operators";
 
 import { Coordinate } from "./coordinate";
 import { StateGraph, stateTransitions } from "./stateGraph";
@@ -102,7 +102,6 @@ const movementKeyDown$: Observable<MovementEvent> =
         .pipe(
             filter(isMovementKey(movementForNow)),
             map(x => {
-                // console.log("down ", x.key);
                 return movementDownEventMap.get(x.key) ?? MovementEvent.None;
             }));
 
@@ -112,10 +111,7 @@ const movementKeyUp$: Observable<MovementEvent> =
         .pipe(
             filter(isMovementKey(movementForNow)),
             map(x => {
-                const movement = movementUpEventMap.get(x.key) ?? MovementEvent.None;
-                // console.log(`movementEvent ${movement}, ${x.key} up`);
-                return movement;
-                // return movementUpEventMap.get(x.key) || MovementEvent.None
+                return movementUpEventMap.get(x.key) ?? MovementEvent.None
             }));
 
 
@@ -221,7 +217,7 @@ const movementStateGraph: StateGraph<MoveKeyCombo, MovementEvent> = new Map([
             { to: MoveKeyCombo.Left, when: MovementEvent.KeyupRight }, 
             { to: MoveKeyCombo.Right, when: MovementEvent.KeyupLeft },
             { to: MoveKeyCombo.UpLeftRight, when: MovementEvent.KeydownUp },
-            { to: MoveKeyCombo.UpLeftDown, when: MovementEvent.KeydownDown },           
+            { to: MoveKeyCombo.DownLeftRight, when: MovementEvent.KeydownDown },           
         ]
     }],
     [MoveKeyCombo.UpLeftDown, {
@@ -255,33 +251,45 @@ function comboToMove(combo: MoveKeyCombo): Movement {
     // console.log("MoveKeyCombo ", combo);
     switch (combo) {
         case MoveKeyCombo.Up:
+        case MoveKeyCombo.UpLeftRight:
             return Movement.Up;
+
         case MoveKeyCombo.UpRight:
             return Movement.UpRight;
         case MoveKeyCombo.UpLeft:
             return Movement.UpLeft;
+
         case MoveKeyCombo.UpDown:
-            return Movement.None;
-        case MoveKeyCombo.UpLeftRight:
-            return Movement.Up;
+        case MoveKeyCombo.LeftRight:
         case MoveKeyCombo.UpLeftRightDown:
             return Movement.None;
-        case MoveKeyCombo.UpLeftDown:
-            return Movement.Left;
-        case MoveKeyCombo.UpRightDown:
-            return Movement.Right;
+        // case MoveKeyCombo.UpLeftRight:
+        //     return Movement.Up;
+        // case MoveKeyCombo.UpLeftRightDown:
+        //     return Movement.None;
+        // case MoveKeyCombo.UpLeftDown:
+        //     return Movement.Left;
+        // case MoveKeyCombo.UpRightDown:
+        //     return Movement.Right;
+        // case MoveKeyCombo.DownLeftRight:
+        //     return Movement.Down;
+        case MoveKeyCombo.Down:
         case MoveKeyCombo.DownLeftRight:
             return Movement.Down;
-        case MoveKeyCombo.Down:
-            return Movement.Down;
+
         case MoveKeyCombo.DownLeft:
             return Movement.DownLeft;
         case MoveKeyCombo.DownRight:
             return Movement.DownRight;
+
         case MoveKeyCombo.Left:
+        case MoveKeyCombo.UpLeftDown:
             return Movement.Left;
         case MoveKeyCombo.Right:
+        case MoveKeyCombo.UpRightDown:
             return Movement.Right;
+        // case MoveKeyCombo.LeftRight:
+        //     return Movement.None
     }
     return Movement.None;
 }
@@ -291,11 +299,10 @@ const movementMachine: (mkc: MoveKeyCombo, me: MovementEvent) => MoveKeyCombo = 
 
 
 // NOTE ************ might need to window last movekeycombo with next one to know what to do ***************
-const movement$ =
-    merge(movementKeyDown$, movementKeyUp$) // KeyEvents
+const movement$: Observable<Movement> =
+    merge(movementKeyDown$, movementKeyUp$, of(MovementEvent.None)) // KeyEvents, of(None) so there's an initial value
         .pipe(
             scan(movementMachine, MoveKeyCombo.None), // state machine over movementcombinations
-            // bufferCount(2, 1) get buffers of [combo, combo] that slide [1, 2] -> [2, 3] -> [3, 4]
             // tap(x => console.log(`machine result: ${x}`)),
             map(comboToMove) // map to actual on screen movement direction
         );

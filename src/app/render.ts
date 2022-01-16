@@ -3,7 +3,7 @@ import { Sprite } from "./sprite";
 function render(sprites: Sprite[], ctx: CanvasRenderingContext2D): void {
     sprites
         .forEach(sprite => {
-            console.log("drawing a sprite!");
+            // console.log("drawing a sprite!");
             ctx.drawImage(
                 sprite.texture.img, 
                 sprite.coordinates.x, 

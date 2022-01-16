@@ -19,6 +19,7 @@ const gameLoop = (subscriber: Subscriber<GameTime>, last: number) => (timeStamp:
 }
 
 
+// switch to animationFrames observable at some point https://rxjs.dev/api/index/function/animationFrames
 const gameLoop$: Observable<GameTime> =
     new Observable(subscriber => {
         let loop = gameLoop(subscriber, 0);
