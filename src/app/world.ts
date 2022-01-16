@@ -1,7 +1,7 @@
 import { Sprite } from "./sprite";
 
-interface GameState {
+interface GameWorld {
     sprites: Sprite[]
 }
 
-export { GameState };
+export { GameWorld };

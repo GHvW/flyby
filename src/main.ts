@@ -8,7 +8,7 @@ import { loadSprites } from './app/load';
 import { Sprite } from './app/sprite';
 import { render } from './app/render';
 import { MoveKeyCombo, Movement, movement$, MovementEvent, movementStateGraph } from './app/controlStreams';
-import { GameState } from './app/world';
+import { GameWorld } from './app/world';
 
  // TODO - actually error handle these
 const canvas: HTMLCanvasElement = document.querySelector('#canvas')!; // yikes!
@@ -21,7 +21,7 @@ const canvasCtx: CanvasRenderingContext2D = canvas.getContext('2d')!; // yikes!
 loadSprites(["./assets/Ships/ship_0005.png"])
   .then(sprites => {
 
-    const state$: BehaviorSubject<GameState> = 
+    const state$: BehaviorSubject<GameWorld> = 
       new BehaviorSubject({
         sprites
       });
@@ -30,7 +30,7 @@ loadSprites(["./assets/Ships/ship_0005.png"])
       .pipe(
         // take(20))
         withLatestFrom(movement$, state$))
-      .subscribe(([gameTime, movement, state]: [GameTime, Movement, GameState]) => {
+      .subscribe(([gameTime, movement, state]: [GameTime, Movement, GameWorld]) => {
 
         // generator map might be nice here
         // console.log("movement: ", movement);
